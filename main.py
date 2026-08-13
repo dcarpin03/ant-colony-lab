@@ -14,6 +14,8 @@ pygame.display.set_caption("Ant Colony Lab")
 clock = pygame.time.Clock()
 
 FPS = 60
+x = 400
+y = 300
 
 running = True
 while running:
@@ -21,6 +23,21 @@ while running:
     for event in pygame.event.get():    
         if event.type == pygame.QUIT:
             running = False
+
+    x += 1
+
+    #Dibujar la pantalla de negro
+    screen.fill((30,30,30))
+
+    pygame.draw.circle(
+        screen,
+        (220, 180, 80),
+        (x, y),
+        10
+    )
+
+    #Actualizar ventana con el dibujo
+    pygame.display.flip()
 
     clock.tick(FPS)
 
