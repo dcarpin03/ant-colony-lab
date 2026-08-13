@@ -1,5 +1,6 @@
 #Punto de entrada de la simulación
 import pygame
+from ant import Ant
 
 #Inicializa componentes necesarios
 pygame.init()   
@@ -14,12 +15,8 @@ pygame.display.set_caption("Ant Colony Lab")
 clock = pygame.time.Clock()
 
 FPS = 60
-x = 400.0
-y = 300.0
 
-direction = pygame.Vector2(1,1).normalize()
-
-speed = 100 #Velocidad de movimiento
+ant = Ant(400, 300)
 dt = 0  #Tiempo desde la última actualización
 
 running = True
@@ -29,18 +26,12 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-    x += direction.x * speed * dt
-    y += direction.y * speed * dt
+    ant.update(dt)
 
     #Dibujar la pantalla de negro
     screen.fill((30,30,30))
 
-    pygame.draw.circle(
-        screen,
-        (220, 180, 80),
-        (x, y),
-        10
-    )
+    ant.draw(screen)
 
     #Actualizar ventana con el dibujo
     pygame.display.flip()
