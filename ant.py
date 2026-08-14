@@ -14,6 +14,8 @@ class Ant:
 
         self.carrying_food = False
 
+        self.pheromone_timer = 0
+
     #Actualizar estado del objeto
     def update(self, dt, world_width, world_height, nest_position):
         if self.carrying_food:
@@ -45,6 +47,8 @@ class Ant:
         elif self.position.y >= world_height - margin:
             self.position.y = world_height - margin
             self.direction.y *= -1
+
+        self.pheromone_timer += dt
 
 
     def draw(self, screen):

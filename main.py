@@ -3,6 +3,7 @@ import pygame
 from ant import Ant
 from nest import Nest
 from food import Food
+from pheromone import Pheromone
 
 #Inicializa componentes necesarios
 pygame.init()
@@ -13,6 +14,7 @@ WIDTH = 800
 HEIGHT = 600
 FOOD_DETECTION_RADIUS = 20
 NEST_DETECTION_RADIUS = 25
+PHEROMONE_INTERVAL = 0.2
 
 #Crear hormiguero en el centro
 nest = Nest(WIDTH / 2, HEIGHT / 2)
@@ -32,6 +34,7 @@ FPS = 60
 ANT_COUNT = 30
 
 ants = []
+pheromones = []
 
 for _ in range(ANT_COUNT):
     ants.append(Ant(nest.position.x, nest.position.y))
@@ -45,7 +48,15 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
+    #Actualizar hormigas
     for ant in ants:
+        if ant.carrying_food and ant.pheromone_timer >= PHEROMONE_INTERVAL:
+            pheromones.append(
+                Pheromone(ant.position.x, ant.position.y)
+            )
+
+            ant.pheromone_timer = 0
+
         ant.update(dt, WIDTH, HEIGHT, nest.position)
 
         if not ant.carrying_food:
@@ -60,6 +71,20 @@ while running:
                 ant.carrying_food = False
                 nest.food_stored += 1
 
+    #Actualizar feromonas
+    for pheromone in pheromones:
+        pheromone.update(dt)
+
+    #Eliminar las feromonas que ya se han evaporado
+    pheromones = [
+        pheromone
+        for pheromone in pheromones
+        if pheromone.strength > 0
+    ]
+
+
+    # ----- DIBUJADO -----
+
     #Dibujar la pantalla de negro (limpiar pantalla)
     screen.fill((30,30,30))
     
@@ -68,6 +93,9 @@ while running:
 
     #Dibujar la fuente de comida
     food.draw(screen)
+
+    for pheromone in pheromones:
+        pheromone.draw(screen)
 
     #Dibujar las hormigas
     for ant in ants:
