@@ -15,10 +15,17 @@ class Ant:
         self.carrying_food = False
 
     #Actualizar estado del objeto
-    def update(self, dt, world_width, world_height):
-        #Grados de giro random
-        turn = random.uniform(-self.turn_speed, self.turn_speed)
-        self.direction = self.direction.rotate(turn * dt)
+    def update(self, dt, world_width, world_height, nest_position):
+        if self.carrying_food:
+            direction_to_nest = nest_position - self.position
+
+            if direction_to_nest.length() > 0:
+                self.direction = direction_to_nest.normalize()
+        else:
+            #Grados de giro random
+            turn = random.uniform(-self.turn_speed, self.turn_speed)
+            self.direction = self.direction.rotate(turn * dt)
+        
         self.position += self.direction * self.speed * dt
 
         margin = 10

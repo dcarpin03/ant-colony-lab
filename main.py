@@ -5,12 +5,14 @@ from nest import Nest
 from food import Food
 
 #Inicializa componentes necesarios
-pygame.init()   
+pygame.init()
+font = pygame.font.Font(None, 28)
 
 #Variables que guardan los límites del mundo
 WIDTH = 800
 HEIGHT = 600
 FOOD_DETECTION_RADIUS = 20
+NEST_DETECTION_RADIUS = 25
 
 #Crear hormiguero en el centro
 nest = Nest(WIDTH / 2, HEIGHT / 2)
@@ -27,7 +29,7 @@ clock = pygame.time.Clock()
 
 FPS = 60
 
-ANT_COUNT = 5
+ANT_COUNT = 30
 
 ants = []
 
@@ -44,14 +46,19 @@ while running:
             running = False
 
     for ant in ants:
-        ant.update(dt, WIDTH, HEIGHT)
+        ant.update(dt, WIDTH, HEIGHT, nest.position)
 
         if not ant.carrying_food:
             distance = ant.position.distance_to(food.position)
 
             if distance < FOOD_DETECTION_RADIUS:
                 ant.carrying_food = True
-                print("¡Una hormiga ha recogido comida!")
+        
+        else:
+            distance_to_nest = ant.position.distance_to(nest.position)
+            if distance_to_nest < NEST_DETECTION_RADIUS:
+                ant.carrying_food = False
+                nest.food_stored += 1
 
     #Dibujar la pantalla de negro (limpiar pantalla)
     screen.fill((30,30,30))
@@ -65,6 +72,15 @@ while running:
     #Dibujar las hormigas
     for ant in ants:
         ant.draw(screen)
+
+    #Dibujar cantidad comida almacenada
+    text = font.render(
+        f"Food Stored: {nest.food_stored}",
+        True,
+        (230, 230, 230)
+    )
+
+    screen.blit(text, (15, 15))
 
     #Actualizar ventana con el dibujo
     pygame.display.flip()
