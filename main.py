@@ -5,8 +5,12 @@ from ant import Ant
 #Inicializa componentes necesarios
 pygame.init()   
 
+#Variables que guardan los límites del mundo
+WIDTH = 800
+HEIGHT = 600
+
 #Crear ventana con unas dimensiones en screen 
-screen = pygame.display.set_mode((800,600)) 
+screen = pygame.display.set_mode((WIDTH, HEIGHT)) 
 
 #Título de la ventana
 pygame.display.set_caption("Ant Colony Lab")    
@@ -16,7 +20,13 @@ clock = pygame.time.Clock()
 
 FPS = 60
 
-ant = Ant(400, 300)
+#Lista de hormigas
+ants = [
+    Ant(400, 300),
+    Ant(420, 300),
+    Ant(380, 300)
+]
+
 dt = 0  #Tiempo desde la última actualización
 
 running = True
@@ -26,12 +36,14 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-    ant.update(dt)
+    for ant in ants:
+        ant.update(dt, WIDTH, HEIGHT)
 
     #Dibujar la pantalla de negro
     screen.fill((30,30,30))
 
-    ant.draw(screen)
+    for ant in ants:
+        ant.draw(screen)
 
     #Actualizar ventana con el dibujo
     pygame.display.flip()
