@@ -15,6 +15,7 @@ HEIGHT = 600
 FOOD_DETECTION_RADIUS = 20
 NEST_DETECTION_RADIUS = 25
 PHEROMONE_INTERVAL = 0.2
+PHEROMONE_DETECTION_RADIUS = 40
 
 #Crear hormiguero en el centro
 nest = Nest(WIDTH / 2, HEIGHT / 2)
@@ -50,6 +51,8 @@ while running:
 
     #Actualizar hormigas
     for ant in ants:
+        nearby_pheromones = []
+
         if ant.carrying_food and ant.pheromone_timer >= PHEROMONE_INTERVAL:
             pheromones.append(
                 Pheromone(ant.position.x, ant.position.y)
@@ -61,6 +64,12 @@ while running:
 
         if not ant.carrying_food:
             distance = ant.position.distance_to(food.position)
+
+            for pheromone in pheromones:
+                distance_to_pheromone = ant.position.distance_to(pheromone.position)
+
+                if distance_to_pheromone < PHEROMONE_DETECTION_RADIUS:
+                    nearby_pheromones.append(pheromone)
 
             if distance < FOOD_DETECTION_RADIUS:
                 ant.carrying_food = True
