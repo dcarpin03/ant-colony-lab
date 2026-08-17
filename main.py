@@ -71,6 +71,19 @@ while running:
                 if distance_to_pheromone < PHEROMONE_DETECTION_RADIUS:
                     nearby_pheromones.append(pheromone)
 
+            if nearby_pheromones:
+                strongest_pheromones = max(
+                    nearby_pheromones,
+                    key=lambda pheromone: pheromone.strength
+                )
+
+                direction_to_pheromone = (
+                    strongest_pheromones.position - ant.position
+                )
+
+                if direction_to_pheromone.length() > 0:
+                    ant.direction = direction_to_pheromone.normalize()
+
             if distance < FOOD_DETECTION_RADIUS:
                 ant.carrying_food = True
         
