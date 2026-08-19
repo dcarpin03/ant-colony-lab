@@ -17,7 +17,7 @@ class Ant:
         self.pheromone_timer = 0
 
     #Actualizar estado del objeto
-    def update(self, dt, world_width, world_height, nest_position):
+    def update(self, dt, nest_position):
         if self.carrying_food:
             direction_to_nest = nest_position - self.position
 
@@ -28,8 +28,11 @@ class Ant:
             turn = random.uniform(-self.turn_speed, self.turn_speed)
             self.direction = self.direction.rotate(turn * dt)
         
-        self.position += self.direction * self.speed * dt
+        self.pheromone_timer += dt
 
+    def move(self, dt, world_width, world_height):
+        self.position += self.direction * self.speed * dt
+        
         margin = 10
 
         if self.position.x <= margin:
@@ -47,9 +50,7 @@ class Ant:
         elif self.position.y >= world_height - margin:
             self.position.y = world_height - margin
             self.direction.y *= -1
-
-        self.pheromone_timer += dt
-
+        
 
     def draw(self, screen):
         head_position = self.position + self.direction * 6

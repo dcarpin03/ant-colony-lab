@@ -16,6 +16,7 @@ FOOD_DETECTION_RADIUS = 20
 NEST_DETECTION_RADIUS = 25
 PHEROMONE_INTERVAL = 0.2
 PHEROMONE_DETECTION_RADIUS = 40
+PHEROMONE_INFLUENCE = 2.0
 
 #Crear hormiguero en el centro
 nest = Nest(WIDTH / 2, HEIGHT / 2)
@@ -53,45 +54,65 @@ while running:
     for ant in ants:
         nearby_pheromones = []
 
-        if ant.carrying_food and ant.pheromone_timer >= PHEROMONE_INTERVAL:
-            pheromones.append(
-                Pheromone(ant.position.x, ant.position.y)
-            )
+        # Actualizar comportamiento / dirección
+        ant.update(dt, nest.position)
 
-            ant.pheromone_timer = 0
-
-        ant.update(dt, WIDTH, HEIGHT, nest.position)
-
+        # Si busca comida, percibe el entorno y las feromonas
         if not ant.carrying_food:
-            distance = ant.position.distance_to(food.position)
-
             for pheromone in pheromones:
                 distance_to_pheromone = ant.position.distance_to(pheromone.position)
 
                 if distance_to_pheromone < PHEROMONE_DETECTION_RADIUS:
                     nearby_pheromones.append(pheromone)
 
+            # Elegimos feromona más intensa
             if nearby_pheromones:
-                strongest_pheromones = max(
+                target_pheromones = max(
                     nearby_pheromones,
-                    key=lambda pheromone: pheromone.strength
+                    key=lambda pheromone: pheromone.position.distance_to(nest.position)
                 )
 
                 direction_to_pheromone = (
-                    strongest_pheromones.position - ant.position
+                    target_pheromones.position - ant.position
                 )
 
                 if direction_to_pheromone.length() > 0:
-                    ant.direction = direction_to_pheromone.normalize()
+                    target_direction = direction_to_pheromone.normalize()
 
-            if distance < FOOD_DETECTION_RADIUS:
+                    ant.direction += (
+                        target_direction * PHEROMONE_INFLUENCE * dt
+                    )
+
+                    ant.direction = ant.direction.normalize()
+
+        
+        # Mover después de recibir la dirección 
+        ant.move(dt, WIDTH, HEIGHT)
+
+        # Comprobar interacciones después del movimiento
+        if not ant.carrying_food:
+            distance_to_food = ant.position.distance_to(food.position)
+
+            if distance_to_food < FOOD_DETECTION_RADIUS:
                 ant.carrying_food = True
         
         else:
             distance_to_nest = ant.position.distance_to(nest.position)
+
             if distance_to_nest < NEST_DETECTION_RADIUS:
                 ant.carrying_food = False
                 nest.food_stored += 1
+
+        # Si vuelve con comida, dejar feromonas
+        if ant.carrying_food and ant.pheromone_timer >= PHEROMONE_INTERVAL:
+            pheromones.append(
+                Pheromone(
+                    ant.position.x,
+                    ant.position.y
+                )
+            )
+
+            ant.pheromone_timer = 0
 
     #Actualizar feromonas
     for pheromone in pheromones:
