@@ -33,13 +33,21 @@ def draw_world():
             ant.draw(screen)
 
         #Dibujar cantidad comida almacenada
-        text = font.render(
+        food_gained = font.render(
             f"Food Stored: {nest.food_stored}",
             True,
             (230, 230, 230)
         )
 
-        screen.blit(text, (15, 15))
+        # Dibujar cantidad comida restante
+        food_remaining = font.render(
+            f"Food remaining: {food.amount}",
+            True,
+            (230, 230, 230)
+        )
+
+        screen.blit(food_gained, (15, 15))
+        screen.blit(food_remaining, (15, 45))
 
 def update_ants(dt, ants, pheromones, nest, food):
     #Actualizar hormigas
@@ -85,8 +93,9 @@ def update_ants(dt, ants, pheromones, nest, food):
         if not ant.carrying_food:
             distance_to_food = ant.position.distance_to(food.position)
 
-            if distance_to_food < FOOD_DETECTION_RADIUS:
+            if distance_to_food < FOOD_DETECTION_RADIUS and food.amount > 0:
                 ant.carrying_food = True
+                food.amount -= 1
         
         else:
             distance_to_nest = ant.position.distance_to(nest.position)
