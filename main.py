@@ -22,8 +22,9 @@ def draw_world():
         #Dibujar hormiguero
         nest.draw(screen)
 
-        #Dibujar la fuente de comida
-        food.draw(screen)
+        #Dibujar las fuentes de comida
+        for food in foods:
+            food.draw(screen)
 
         for pheromone in pheromones:
             pheromone.draw(screen)
@@ -39,9 +40,15 @@ def draw_world():
             (230, 230, 230)
         )
 
+        #Calcular cantidad comida total
+        total_food_remaining = sum(
+            food.amount
+            for food in foods
+        )
+
         # Dibujar cantidad comida restante
         food_remaining = font.render(
-            f"Food remaining: {food.amount}",
+            f"Food remaining: {total_food_remaining}",
             True,
             (230, 230, 230)
         )
@@ -49,7 +56,7 @@ def draw_world():
         screen.blit(food_gained, (15, 15))
         screen.blit(food_remaining, (15, 45))
 
-def update_ants(dt, ants, pheromones, nest, food):
+def update_ants(dt, ants, pheromones, nest, foods):
     #Actualizar hormigas
     for ant in ants:
         nearby_pheromones = []
@@ -91,11 +98,13 @@ def update_ants(dt, ants, pheromones, nest, food):
 
         # Comprobar interacciones después del movimiento
         if not ant.carrying_food:
-            distance_to_food = ant.position.distance_to(food.position)
+            for food in foods:
+                distance_to_food = ant.position.distance_to(food.position)
 
-            if distance_to_food < FOOD_DETECTION_RADIUS and food.amount > 0:
-                ant.carrying_food = True
-                food.amount -= 1
+                if distance_to_food < FOOD_DETECTION_RADIUS and food.amount > 0:
+                    ant.carrying_food = True
+                    food.amount -= 1
+                    break
         
         else:
             distance_to_nest = ant.position.distance_to(nest.position)
@@ -132,7 +141,7 @@ def update_pheromones(dt, pheromones):
 pygame.init()
 font = pygame.font.Font(None, 28)
 
-#Variables que guardan los límites del mundo
+#CONSTANTES
 WIDTH = 800
 HEIGHT = 600
 FOOD_DETECTION_RADIUS = 20
@@ -143,7 +152,11 @@ PHEROMONE_INFLUENCE = 2.0
 
 #Crear hormiguero en el centro
 nest = Nest(WIDTH / 2, HEIGHT / 2)
-food = Food(650, 200)
+foods = [
+    Food(650, 200),
+    Food(150, 150),
+    Food(650, 500)
+]
 
 #Crear ventana con unas dimensiones en screen 
 screen = pygame.display.set_mode((WIDTH, HEIGHT)) 
@@ -172,7 +185,7 @@ while running:
     running = handle_events()
 
     #Actualizar hormigas y feromonas
-    update_ants(dt, ants, pheromones, nest, food)
+    update_ants(dt, ants, pheromones, nest, foods)
     pheromones = update_pheromones(dt, pheromones)
 
     # ----- DIBUJADO -----
