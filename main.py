@@ -5,51 +5,43 @@ from nest import Nest
 from food import Food
 from pheromone import Pheromone
 
-#Inicializa componentes necesarios
-pygame.init()
-font = pygame.font.Font(None, 28)
-
-#Variables que guardan los límites del mundo
-WIDTH = 800
-HEIGHT = 600
-FOOD_DETECTION_RADIUS = 20
-NEST_DETECTION_RADIUS = 25
-PHEROMONE_INTERVAL = 0.2
-PHEROMONE_DETECTION_RADIUS = 40
-PHEROMONE_INFLUENCE = 2.0
-
-#Crear hormiguero en el centro
-nest = Nest(WIDTH / 2, HEIGHT / 2)
-food = Food(650, 200)
-
-#Crear ventana con unas dimensiones en screen 
-screen = pygame.display.set_mode((WIDTH, HEIGHT)) 
-
-#Título de la ventana
-pygame.display.set_caption("Ant Colony Lab")    
-
-# Reloj para controlar el paso del tiempo en la simulación
-clock = pygame.time.Clock()
-
-FPS = 60
-
-ANT_COUNT = 30
-
-ants = []
-pheromones = []
-
-for _ in range(ANT_COUNT):
-    ants.append(Ant(nest.position.x, nest.position.y))
-
-dt = 0  #Tiempo desde la última actualización
-
-running = True
-while running:
+## Métodos
+def handle_events():
     #Recorre uno por uno todos los eventos que ocurren
     for event in pygame.event.get():    
         if event.type == pygame.QUIT:
-            running = False
+            return False
 
+    return True
+
+
+def draw_world():
+    #Dibujar la pantalla de negro (limpiar pantalla)
+        screen.fill((30,30,30))
+        
+        #Dibujar hormiguero
+        nest.draw(screen)
+
+        #Dibujar la fuente de comida
+        food.draw(screen)
+
+        for pheromone in pheromones:
+            pheromone.draw(screen)
+
+        #Dibujar las hormigas
+        for ant in ants:
+            ant.draw(screen)
+
+        #Dibujar cantidad comida almacenada
+        text = font.render(
+            f"Food Stored: {nest.food_stored}",
+            True,
+            (230, 230, 230)
+        )
+
+        screen.blit(text, (15, 15))
+
+def update_ants(dt, ants, pheromones, nest, food):
     #Actualizar hormigas
     for ant in ants:
         nearby_pheromones = []
@@ -65,7 +57,7 @@ while running:
                 if distance_to_pheromone < PHEROMONE_DETECTION_RADIUS:
                     nearby_pheromones.append(pheromone)
 
-            # Elegimos feromona más intensa
+            # Elegimos feromona más alejada del hormiguero
             if nearby_pheromones:
                 target_pheromones = max(
                     nearby_pheromones,
@@ -114,44 +106,68 @@ while running:
 
             ant.pheromone_timer = 0
 
+def update_pheromones(dt, pheromones):
     #Actualizar feromonas
     for pheromone in pheromones:
         pheromone.update(dt)
 
     #Eliminar las feromonas que ya se han evaporado
-    pheromones = [
+    return [
         pheromone
         for pheromone in pheromones
         if pheromone.strength > 0
     ]
 
 
+#Inicializa componentes necesarios
+pygame.init()
+font = pygame.font.Font(None, 28)
+
+#Variables que guardan los límites del mundo
+WIDTH = 800
+HEIGHT = 600
+FOOD_DETECTION_RADIUS = 20
+NEST_DETECTION_RADIUS = 25
+PHEROMONE_INTERVAL = 0.2
+PHEROMONE_DETECTION_RADIUS = 40
+PHEROMONE_INFLUENCE = 2.0
+
+#Crear hormiguero en el centro
+nest = Nest(WIDTH / 2, HEIGHT / 2)
+food = Food(650, 200)
+
+#Crear ventana con unas dimensiones en screen 
+screen = pygame.display.set_mode((WIDTH, HEIGHT)) 
+
+#Título de la ventana
+pygame.display.set_caption("Ant Colony Lab")    
+
+# Reloj para controlar el paso del tiempo en la simulación
+clock = pygame.time.Clock()
+
+FPS = 60
+
+ANT_COUNT = 30
+
+ants = []
+pheromones = []
+
+for _ in range(ANT_COUNT):
+    ants.append(Ant(nest.position.x, nest.position.y))
+
+dt = 0  #Tiempo desde la última actualización
+
+running = True
+while running:
+    #Capturar eventos
+    running = handle_events()
+
+    #Actualizar hormigas y feromonas
+    update_ants(dt, ants, pheromones, nest, food)
+    pheromones = update_pheromones(dt, pheromones)
+
     # ----- DIBUJADO -----
-
-    #Dibujar la pantalla de negro (limpiar pantalla)
-    screen.fill((30,30,30))
-    
-    #Dibujar hormiguero
-    nest.draw(screen)
-
-    #Dibujar la fuente de comida
-    food.draw(screen)
-
-    for pheromone in pheromones:
-        pheromone.draw(screen)
-
-    #Dibujar las hormigas
-    for ant in ants:
-        ant.draw(screen)
-
-    #Dibujar cantidad comida almacenada
-    text = font.render(
-        f"Food Stored: {nest.food_stored}",
-        True,
-        (230, 230, 230)
-    )
-
-    screen.blit(text, (15, 15))
+    draw_world()
 
     #Actualizar ventana con el dibujo
     pygame.display.flip()
