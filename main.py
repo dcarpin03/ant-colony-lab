@@ -12,6 +12,9 @@ def handle_events():
     for event in pygame.event.get():    
         if event.type == pygame.QUIT:
             return False
+        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            x, y = event.pos
+            foods.append(Food(x, y))
 
     return True
 
