@@ -117,6 +117,59 @@ Los siguientes objetivos del proyecto son:
 - Diseñar y registrar experimentos.
 - Analizar el comportamiento emergente de la colonia.
 
+## 🔬 Experimentos y observaciones
+
+Además de desarrollar nuevas funcionalidades, Ant Colony Lab se utiliza para observar cómo pequeñas reglas individuales pueden producir comportamientos colectivos en la colonia.
+
+### Experimento 01 — Múltiples fuentes de comida
+
+**Configuración**
+
+- Hormigas: 30
+- Fuentes de comida: 3
+- Cantidad inicial por fuente: 50 unidades
+- Movimiento exploratorio aleatorio.
+- Las hormigas que encuentran comida regresan al hormiguero dejando feromonas.
+- Las hormigas exploradoras pueden detectar y seguir rastros de feromonas cercanos.
+- Las feromonas pierden intensidad progresivamente hasta desaparecer.
+
+**Comportamiento observado**
+
+Al comenzar la simulación, todas las hormigas salen del hormiguero sin conocer la posición de las fuentes de comida. Por este motivo, inicialmente se dispersan por el entorno siguiendo su comportamiento exploratorio.
+
+Cuando una hormiga encuentra una fuente de comida, recoge una unidad y regresa al hormiguero dejando un rastro de feromonas durante el recorrido.
+
+Las hormigas exploradoras que encuentran este rastro modifican progresivamente su dirección y comienzan a seguirlo. Como consecuencia, varias hormigas terminan recorriendo caminos similares hacia la misma fuente de comida.
+
+Esto provoca una concentración progresiva de hormigas alrededor de las rutas que han permitido encontrar alimento.
+
+Cuando una fuente se agota, las hormigas dejan de obtener comida de ella. Al desaparecer progresivamente las feromonas existentes, las hormigas vuelven a dispersarse y recuperan principalmente su comportamiento exploratorio.
+
+Cuando alguna hormiga encuentra otra fuente de comida, comienza a generar un nuevo rastro y el proceso vuelve a repetirse.
+
+**Resultado**
+
+Durante la simulación se observa un ciclo:
+
+`exploración → descubrimiento → creación de rastro → concentración de hormigas → agotamiento → dispersión → nuevo descubrimiento`
+
+Este comportamiento no está programado explícitamente como una estrategia global. Ninguna hormiga conoce la posición de las fuentes ni existe un controlador que indique a la colonia qué fuente debe explotar.
+
+El comportamiento colectivo aparece como consecuencia de reglas locales simples aplicadas por cada hormiga.
+
+Esto constituye una primera observación de **comportamiento emergente e inteligencia colectiva** dentro de Ant Colony Lab.
+
+**Observaciones futuras**
+
+Este experimento plantea nuevas preguntas que podremos estudiar más adelante:
+
+- ¿Qué ocurre al modificar el número de hormigas?
+- ¿Cuánto influye la duración de las feromonas?
+- ¿Qué ocurre si existen fuentes con diferentes cantidades de comida?
+- ¿La colonia favorece las fuentes más cercanas?
+- ¿Qué ocurre si dos fuentes son descubiertas simultáneamente?
+- ¿Cuánto tarda la colonia en abandonar una ruta cuando una fuente se agota?
+
 ## 🔬 Experimentos futuros
 
 Ant Colony Lab pretende utilizarse como un pequeño laboratorio donde podamos estudiar preguntas como:

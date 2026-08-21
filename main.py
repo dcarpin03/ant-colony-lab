@@ -4,6 +4,7 @@ from ant import Ant
 from nest import Nest
 from food import Food
 from pheromone import Pheromone
+from obstacle import Obstacle
 
 ## Métodos
 def handle_events():
@@ -16,7 +17,7 @@ def handle_events():
 
 
 def draw_world():
-    #Dibujar la pantalla de negro (limpiar pantalla)
+        #Dibujar la pantalla de negro (limpiar pantalla)
         screen.fill((30,30,30))
         
         #Dibujar hormiguero
@@ -25,6 +26,10 @@ def draw_world():
         #Dibujar las fuentes de comida
         for food in foods:
             food.draw(screen)
+
+        #Dibujar obstáculos
+        for obstacle in obstacles:
+            obstacle.draw(screen)
 
         for pheromone in pheromones:
             pheromone.draw(screen)
@@ -56,7 +61,7 @@ def draw_world():
         screen.blit(food_gained, (15, 15))
         screen.blit(food_remaining, (15, 45))
 
-def update_ants(dt, ants, pheromones, nest, foods):
+def update_ants(dt, ants, pheromones, nest, foods, obstacles):
     #Actualizar hormigas
     for ant in ants:
         nearby_pheromones = []
@@ -94,7 +99,7 @@ def update_ants(dt, ants, pheromones, nest, foods):
 
         
         # Mover después de recibir la dirección 
-        ant.move(dt, WIDTH, HEIGHT)
+        ant.move(dt, WIDTH, HEIGHT, obstacles)
 
         # Comprobar interacciones después del movimiento
         if not ant.carrying_food:
@@ -152,10 +157,18 @@ PHEROMONE_INFLUENCE = 2.0
 
 #Crear hormiguero en el centro
 nest = Nest(WIDTH / 2, HEIGHT / 2)
+
+#Crear fuentes de comida
 foods = [
     Food(650, 200),
     Food(150, 150),
     Food(650, 500)
+]
+
+#Crear obstáculos
+obstacles = [
+    Obstacle(250, 180, 120, 30),
+    Obstacle(500, 380, 30, 120)
 ]
 
 #Crear ventana con unas dimensiones en screen 
@@ -185,7 +198,7 @@ while running:
     running = handle_events()
 
     #Actualizar hormigas y feromonas
-    update_ants(dt, ants, pheromones, nest, foods)
+    update_ants(dt, ants, pheromones, nest, foods, obstacles)
     pheromones = update_pheromones(dt, pheromones)
 
     # ----- DIBUJADO -----

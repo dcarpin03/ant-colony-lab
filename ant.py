@@ -16,22 +16,43 @@ class Ant:
 
         self.pheromone_timer = 0
 
+        #Variable que indica si la hormiga ha detectado una colisión o no
+        self.avoidance_timer = 0
+
     #Actualizar estado del objeto
     def update(self, dt, nest_position):
-        if self.carrying_food:
+        if self.avoidance_timer > 0:
+            #Esquivando obstáculos
+            self.avoidance_timer -= dt
+        elif self.carrying_food:
+            #Redireccionar dirección hacia hormiguero
             direction_to_nest = nest_position - self.position
 
             if direction_to_nest.length() > 0:
                 self.direction = direction_to_nest.normalize()
         else:
-            #Grados de giro random
+            #Grados de giro random para explorar
             turn = random.uniform(-self.turn_speed, self.turn_speed)
             self.direction = self.direction.rotate(turn * dt)
         
         self.pheromone_timer += dt
 
-    def move(self, dt, world_width, world_height):
-        self.position += self.direction * self.speed * dt
+    def move(self, dt, world_width, world_height, obstacles):
+
+        next_position = self.position + self.direction * self.speed * dt
+
+        collision = False
+
+        for obstacle in obstacles:
+            if obstacle.rect.collidepoint(next_position.x, next_position.y):
+                collision = True
+                break
+
+        if not collision:
+            self.position = next_position
+        else:
+            self.direction = self.direction.rotate(120)
+            self.avoidance_timer = 0.5
         
         margin = 10
 
