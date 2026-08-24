@@ -15,11 +15,24 @@ def handle_events():
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             x, y = event.pos
             foods.append(Food(x, y))
+        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
+            x, y = event.pos
+
+            obstacle_width = 80
+            obstacle_height = 20
+
+            obstacles.append(
+                Obstacle(
+                    x - obstacle_width / 2, 
+                    y - obstacle_height / 2, 
+                    obstacle_width, 
+                    obstacle_height)
+                )
 
     return True
 
 
-def draw_world():
+def draw_world(screen, nest, foods, obstacles, pheromones, ants):
         #Dibujar la pantalla de negro (limpiar pantalla)
         screen.fill((30,30,30))
         
@@ -82,13 +95,13 @@ def update_ants(dt, ants, pheromones, nest, foods, obstacles):
 
             # Elegimos feromona más alejada del hormiguero
             if nearby_pheromones:
-                target_pheromones = max(
+                target_pheromone = max(
                     nearby_pheromones,
                     key=lambda pheromone: pheromone.position.distance_to(nest.position)
                 )
 
                 direction_to_pheromone = (
-                    target_pheromones.position - ant.position
+                    target_pheromone.position - ant.position
                 )
 
                 if direction_to_pheromone.length() > 0:
@@ -205,7 +218,7 @@ while running:
     pheromones = update_pheromones(dt, pheromones)
 
     # ----- DIBUJADO -----
-    draw_world()
+    draw_world(screen, nest, foods, obstacles, pheromones, ants)
 
     #Actualizar ventana con el dibujo
     pygame.display.flip()
