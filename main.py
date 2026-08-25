@@ -7,11 +7,13 @@ from pheromone import Pheromone
 from obstacle import Obstacle
 
 ## Métodos
-def handle_events():
+def handle_events(paused, show_pheromones):
     #Recorre uno por uno todos los eventos que ocurren
     for event in pygame.event.get():    
         if event.type == pygame.QUIT:
-            return False
+            return False, paused, show_pheromones
+        elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+            paused = not paused
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             x, y = event.pos
             foods.append(Food(x, y))
@@ -28,11 +30,13 @@ def handle_events():
                     obstacle_width, 
                     obstacle_height)
                 )
+        elif event.type == pygame.KEYDOWN and event.key == pygame.K_f:
+            show_pheromones = not show_pheromones
 
-    return True
+    return True, paused, show_pheromones
 
 
-def draw_world(screen, nest, foods, obstacles, pheromones, ants):
+def draw_world(screen, nest, foods, obstacles, pheromones, ants, paused, show_pheromones):
         #Dibujar la pantalla de negro (limpiar pantalla)
         screen.fill((30,30,30))
         
@@ -47,8 +51,9 @@ def draw_world(screen, nest, foods, obstacles, pheromones, ants):
         for obstacle in obstacles:
             obstacle.draw(screen)
 
-        for pheromone in pheromones:
-            pheromone.draw(screen)
+        if show_pheromones:
+            for pheromone in pheromones:
+                pheromone.draw(screen)
 
         #Dibujar las hormigas
         for ant in ants:
@@ -74,8 +79,28 @@ def draw_world(screen, nest, foods, obstacles, pheromones, ants):
             (230, 230, 230)
         )
 
+        pheremones_visibility = font.render(
+            f"Pheromones: {'ON' if show_pheromones else 'OFF'}",
+            True,
+            (230, 230, 230)
+        )
+
+        if paused:
+            paused_text = paused_font.render(
+                "PAUSED",
+                True,
+                (230, 230, 230)
+            )
+
+            paused_rect = paused_text.get_rect(
+                center = (WIDTH / 2, 25)
+            )
+
+            screen.blit(paused_text, paused_rect)
+
         screen.blit(food_gained, (15, 15))
         screen.blit(food_remaining, (15, 45))
+        screen.blit(pheremones_visibility, (15, 75))
 
 def update_ants(dt, ants, pheromones, nest, foods, obstacles):
     #Actualizar hormigas
@@ -160,7 +185,8 @@ def update_pheromones(dt, pheromones):
 
 #Inicializa componentes necesarios
 pygame.init()
-font = pygame.font.Font(None, 28)
+font = pygame.font.Font(None, 20)
+paused_font = pygame.font.Font(None, 32)
 
 #CONSTANTES
 WIDTH = 800
@@ -170,6 +196,12 @@ NEST_DETECTION_RADIUS = 25
 PHEROMONE_INTERVAL = 0.2
 PHEROMONE_DETECTION_RADIUS = 40
 PHEROMONE_INFLUENCE = 2.0
+
+#Para reanudar o parar la simulación
+paused = False
+
+#Mostrar o no las feromonas
+show_pheromones = True
 
 #Crear hormiguero en el centro
 nest = Nest(WIDTH / 2, HEIGHT / 2)
@@ -211,14 +243,15 @@ dt = 0  #Tiempo desde la última actualización
 running = True
 while running:
     #Capturar eventos
-    running = handle_events()
+    running, paused, show_pheromones = handle_events(paused, show_pheromones)
 
-    #Actualizar hormigas y feromonas
-    update_ants(dt, ants, pheromones, nest, foods, obstacles)
-    pheromones = update_pheromones(dt, pheromones)
+    if not paused:
+        #Actualizar hormigas y feromonas
+        update_ants(dt, ants, pheromones, nest, foods, obstacles)
+        pheromones = update_pheromones(dt, pheromones)
 
     # ----- DIBUJADO -----
-    draw_world(screen, nest, foods, obstacles, pheromones, ants)
+    draw_world(screen, nest, foods, obstacles, pheromones, ants, paused, show_pheromones)
 
     #Actualizar ventana con el dibujo
     pygame.display.flip()
