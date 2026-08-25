@@ -7,13 +7,19 @@ from pheromone import Pheromone
 from obstacle import Obstacle
 
 ## Métodos
-def handle_events(paused, show_pheromones):
+def handle_events(paused, show_pheromones, simulation_speed_index):
     #Recorre uno por uno todos los eventos que ocurren
     for event in pygame.event.get():    
         if event.type == pygame.QUIT:
-            return False, paused, show_pheromones
+            return False, paused, show_pheromones, simulation_speed_index
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
             paused = not paused
+        elif event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+            if simulation_speed_index < len(SIMULATION_SPEEDS) - 1:
+                simulation_speed_index += 1
+        elif event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
+            if simulation_speed_index > 0:
+                simulation_speed_index -= 1
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             x, y = event.pos
             foods.append(Food(x, y))
@@ -33,10 +39,20 @@ def handle_events(paused, show_pheromones):
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_f:
             show_pheromones = not show_pheromones
 
-    return True, paused, show_pheromones
+    return True, paused, show_pheromones, simulation_speed_index
 
 
-def draw_world(screen, nest, foods, obstacles, pheromones, ants, paused, show_pheromones):
+def draw_world(
+        screen, 
+        nest, 
+        foods, 
+        obstacles, 
+        pheromones, 
+        ants, 
+        paused, 
+        show_pheromones,
+        simulation_speed
+    ):
         #Dibujar la pantalla de negro (limpiar pantalla)
         screen.fill((30,30,30))
         
@@ -79,8 +95,14 @@ def draw_world(screen, nest, foods, obstacles, pheromones, ants, paused, show_ph
             (230, 230, 230)
         )
 
-        pheremones_visibility = font.render(
+        pheromones_visibility = font.render(
             f"Pheromones: {'ON' if show_pheromones else 'OFF'}",
+            True,
+            (230, 230, 230)
+        )
+
+        simulation_speed_text = font.render(
+            f"Simulation speed: {simulation_speed}x",
             True,
             (230, 230, 230)
         )
@@ -100,7 +122,8 @@ def draw_world(screen, nest, foods, obstacles, pheromones, ants, paused, show_ph
 
         screen.blit(food_gained, (15, 15))
         screen.blit(food_remaining, (15, 45))
-        screen.blit(pheremones_visibility, (15, 75))
+        screen.blit(pheromones_visibility, (15, 75))
+        screen.blit(simulation_speed_text, (15, 105))
 
 def update_ants(dt, ants, pheromones, nest, foods, obstacles):
     #Actualizar hormigas
@@ -219,6 +242,10 @@ obstacles = [
     Obstacle(500, 380, 30, 120)
 ]
 
+#Velocidades disponibles
+SIMULATION_SPEEDS = [0.5, 1.0, 2.0, 4.0]
+simulation_speed_index = 1
+
 #Crear ventana con unas dimensiones en screen 
 screen = pygame.display.set_mode((WIDTH, HEIGHT)) 
 
@@ -243,15 +270,32 @@ dt = 0  #Tiempo desde la última actualización
 running = True
 while running:
     #Capturar eventos
-    running, paused, show_pheromones = handle_events(paused, show_pheromones)
+    running, paused, show_pheromones, simulation_speed_index = handle_events(
+        paused, 
+        show_pheromones, 
+        simulation_speed_index
+    )
+
+    simulation_speed = SIMULATION_SPEEDS[simulation_speed_index]
+    simulation_dt = dt * simulation_speed
 
     if not paused:
         #Actualizar hormigas y feromonas
-        update_ants(dt, ants, pheromones, nest, foods, obstacles)
-        pheromones = update_pheromones(dt, pheromones)
+        update_ants(simulation_dt, ants, pheromones, nest, foods, obstacles)
+        pheromones = update_pheromones(simulation_dt, pheromones)
 
     # ----- DIBUJADO -----
-    draw_world(screen, nest, foods, obstacles, pheromones, ants, paused, show_pheromones)
+    draw_world(
+        screen, 
+        nest, 
+        foods, 
+        obstacles, 
+        pheromones, 
+        ants, 
+        paused, 
+        show_pheromones,
+        simulation_speed
+    )
 
     #Actualizar ventana con el dibujo
     pygame.display.flip()
