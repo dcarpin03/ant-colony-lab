@@ -13,7 +13,7 @@ A lo largo del desarrollo se exploran conceptos relacionados con simulación, ag
 - **Git** — control de versiones.
 - **GitHub** — repositorio y documentación del proyecto.
 
-## 🧪 Estado actual
+## Estado actual
 
 Actualmente Ant Colony Lab cuenta con una primera simulación funcional de una colonia artificial.
 
@@ -98,7 +98,7 @@ La simulación muestra actualmente:
 
 Esta será la base para añadir nuevas métricas y poder realizar experimentos sobre el comportamiento de la colonia.
 
-## 🔬 Experimentos y observaciones
+## Experimentos y observaciones
 
 Además de desarrollar nuevas funcionalidades, Ant Colony Lab se utiliza para observar cómo pequeñas reglas individuales pueden producir comportamientos colectivos en la colonia.
 
@@ -140,27 +140,13 @@ El comportamiento colectivo aparece como consecuencia de reglas locales simples 
 
 Esto constituye una primera observación de **comportamiento emergente e inteligencia colectiva** dentro de Ant Colony Lab.
 
-**Observaciones futuras**
-
-Este experimento plantea nuevas preguntas que podremos estudiar más adelante:
-
-- ¿Qué ocurre al modificar el número de hormigas?
-- ¿Cuánto influye la duración de las feromonas?
-- ¿Qué ocurre si existen fuentes con diferentes cantidades de comida?
-- ¿La colonia favorece las fuentes más cercanas?
-- ¿Qué ocurre si dos fuentes son descubiertas simultáneamente?
-- ¿Cuánto tarda la colonia en abandonar una ruta cuando una fuente se agota?
-
 ## Experimentos futuros
 
-Ant Colony Lab pretende utilizarse como un pequeño laboratorio donde podamos estudiar preguntas como:
+Ant Colony Lab pretende utilizarse como un pequeño laboratorio donde podamos estudiar que ocurre cuándo:
 
-- ¿Qué ocurre al aumentar el número de hormigas?
-- ¿Cómo afecta la velocidad de evaporación de las feromonas?
-- ¿Qué ocurre si las feromonas permanecen durante demasiado tiempo?
-- ¿Cómo cambia el comportamiento con varias fuentes de comida?
-- ¿Qué ocurre si aparece un obstáculo sobre una ruta establecida?
-- ¿Puede la colonia encontrar rutas alternativas?
-- ¿Aparecen caminos estables sin que ninguna hormiga conozca el mapa completo?
+- Se incrementa el número de hormigas
+- Las feromonas permanecen durante demasiado tiempo
+- Aparece un obstáculo sobre una ruta establecida
+- La colonia  intenta encontrar rutas alternativas
 
-Los resultados de estos experimentos podrán documentarse posteriormente dentro de una carpeta `docs/`.
+Los resultados de estos experimentos se documentarán posteriormente
